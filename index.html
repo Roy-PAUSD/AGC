@@ -12,10 +12,7 @@
 <p>Upload a raw image; the backend runs Canny edge detection, then <code>build_fits</code> to get a polynomial set. Use the sliders below to tune the view live.</p>
 <hr>
 <div>
-  <label>
-    <b>Upload image</b>
-    <input type="file" id="upload" accept="image/*">
-  </label>
+  <label><b>Upload image</b><input type="file" id="upload" accept="image/*"></label>
   <br>
   <small id="status">No fits loaded yet. Upload an image to start.</small>
 </div>
@@ -52,8 +49,7 @@
 </div>
 <br>
 <div>
-  <label>
-    <b>View x_min</b>
+  <label><b>View x_min</b>
     <input type="range" id="x_min" min="-30" max="0" step="0.5" value="-10.0">
     <output id="x_min_v">-10.0</output>
   </label>
@@ -85,8 +81,7 @@
 <br>
 <div>
   <label>
-    <input type="checkbox" id="restrict_domain" checked>
-    <b>Restrict domain to the original segment</b>
+    <input type="checkbox" id="restrict_domain" checked><b>Restrict domain to the original segment</b>
   </label>
   <br>
   <small>If checked, each curve is drawn only on its original stroke range; otherwise the polynomial spans the whole viewport (curves will extend past the original stroke).</small>
