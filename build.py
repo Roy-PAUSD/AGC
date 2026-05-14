@@ -4,6 +4,7 @@ import os
 import sys
 import warnings
 import numpy as n
+
 try:
     _rw = n.exceptions.RankWarning      # np≥2.0
 except AttributeError:
@@ -22,6 +23,10 @@ DC = [
     "#c74440", "#2d70b3", "#388c46", "#6042a6", "#000000",
     "#fa7e19", "#c55c1e", "#3d8545", "#b0407c", "#c78433",
 ]
+
+
+
+
 def ctl(cs, ot, dm=6):
     """对应index.html中JS的coeffsToLatex,服务端版."""
     lh = "y" if ot == "y=f(x)" else "x"
@@ -41,6 +46,14 @@ def ctl(cs, ot, dm=6):
         else:
             ts.append(f"{sg}{vl}{v}^{{{p}}}")
     return f"{lh}={''.join(ts) if ts else '0'}"
+
+
+
+
+
+
+
+
 def bcs(fd, bd):
     """返字典匹配calculator.getState()/setState() schema."""
     xn, xx, yn, yx = bd
@@ -66,6 +79,9 @@ def bcs(fd, bd):
         },
         "expressions": {"list": es},
     }
+
+
+
 def sf(st):
     fs = st["fits"]
     o = []
@@ -84,6 +100,9 @@ def sf(st):
             "color": DC[i % len(DC)],
         })
     return o
+
+
+
 def main():
     print(f"Loading {OP} ...")
     st = build_fits(OP, bounds=BD,
