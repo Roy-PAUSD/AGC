@@ -1,3 +1,3 @@
-# AGC
+# Art Graphing Calculator
 
-Math Project
+Geo H Math Project
