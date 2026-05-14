@@ -11,6 +11,7 @@ import warnings
 from http.server import BaseHTTPRequestHandler as B, ThreadingHTTPServer as T
 import cv2
 import numpy as n
+
 try:
     _rw = n.exceptions.RankWarning
 except AttributeError:
@@ -28,6 +29,12 @@ DC = [
 IP = os.path.join(H, "index.html")
 SP = os.path.join(H, "static.html")
 MUB = 20 * 1024 * 1024
+
+
+
+
+
+
 def eo(rp, op):
     """原图→白底黑线轮廓供build_fits用.灰度→高斯模糊→Canny→反转."""
     im = cv2.imread(rp, cv2.IMREAD_COLOR)
@@ -39,6 +46,8 @@ def eo(rp, op):
     ol = cv2.bitwise_not(ed)
     if not cv2.imwrite(op, ol):
         raise IOError(f"failed to write outline to {op}")
+
+
 def sf(st):
     fs = st["fits"]
     o = []
@@ -57,6 +66,9 @@ def sf(st):
             "color": DC[i % len(DC)],
         })
     return o
+
+
+
 def fp(ipx):
     st = build_fits(ipx, bounds=BD,
                        max_degree=MD, rel_tol=0.005)
@@ -76,6 +88,7 @@ class Hd(B):
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(b)
+
     def _sj(self, s, pl):
         b = json.dumps(pl).encode("utf-8")
         self._sb(s, b, "application/json; charset=utf-8")
@@ -113,6 +126,7 @@ class Hd(B):
         d = self.rfile.read(ln)
         ct = self.headers.get("Content-Type", "")
         ex = ".png"
+
         if "jpeg" in ct or "jpg" in ct:
             ex = ".jpg"
         elif "bmp" in ct:
@@ -123,6 +137,7 @@ class Hd(B):
         ofd, op = tempfile.mkstemp(suffix=".png")
         os.close(ofd)
         try:
+    
             with os.fdopen(rfd, "wb") as f:
                 f.write(d)
             try:
@@ -141,6 +156,7 @@ class Hd(B):
                     os.remove(px)
                 except OSError:
                     pass
+
     def log_message(self, fmt, *args):
         sys.stderr.write(f"[{self.log_date_time_string()}] {fmt % args}\n")
 def main():
