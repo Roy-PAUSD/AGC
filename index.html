@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Polynomial Fits — Desmos</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://www.desmos.com/api/v1.7/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+</head>
+<body>
+<h2>Polynomial Fits — Desmos</h2>
+<p>Upload a raw image; the backend runs Canny edge detection, then <code>build_fits</code> to get a polynomial set. Use the sliders below to tune the view live.</p>
+<hr>
+<div>
+  <label>
+    <b>Upload image</b>
+    <input type="file" id="upload" accept="image/*">
+  </label>
+  <br>
+  <small id="status">No fits loaded yet. Upload an image to start.</small>
+</div>
+
+<div style="display:flex;gap:8px;align-items:flex-start;margin-top:6px">
+  <div>
+    <small>Original upload:</small><br>
+    <img id="preview_raw" alt="(no upload yet)" style="max-width:240px;max-height:180px;border:1px solid #aaa">
+  </div>
+  <div>
+    <small>Outline (Canny + invert, fed to build_fits):</small><br>
+    <img id="preview_outline" alt="(no outline yet)" style="max-width:240px;max-height:180px;border:1px solid #aaa;background:#fff">
+  </div>
+</div>
+<hr>
+<div>
+  <label>
+    <b>Keep top N (Top-N)</b>
+    <input type="range" id="top_n" min="1" max="1" value="1" disabled>
+    <output id="top_n_v">0</output> / <span id="top_n_total">0</span>
+  </label>
+  <br>
+  <small>Sorted by arc length + bbox diagonal; only the first N curves are drawn. Smaller N = only major outlines; larger N = closer to full image.</small>
+</div>
+<br>
+<div>
+  <label>
+    <b>Max degree</b>
+    <input type="range" id="max_deg" min="1" max="15" value="12">
+    <output id="max_deg_v">12</output>
+  </label>
+  <br>
+  <small>Filter out polynomials above this degree. Lower degree is more stable but coarse; higher degree hugs the data but may oscillate at segment ends.</small>
+</div>
+<br>
+<div>
+  <label>
+    <b>View x_min</b>
+    <input type="range" id="x_min" min="-30" max="0" step="0.5" value="-10.0">
+    <output id="x_min_v">-10.0</output>
+  </label>
+  &nbsp;&nbsp;
+  <label>
+    <b>View x_max</b>
+    <input type="range" id="x_max" min="0" max="30" step="0.5" value="10.0">
+    <output id="x_max_v">10.0</output>
+  </label>
+  <br>
+  <small>x-axis range of the Desmos viewport. Does not re-fit; just moves the camera.</small>
+</div>
+<br>
+<div>
+  <label>
+    <b>View y_min</b>
+    <input type="range" id="y_min" min="-30" max="0" step="0.5" value="-7.0">
+    <output id="y_min_v">-7.0</output>
+  </label>
+  &nbsp;&nbsp;
+  <label>
+    <b>View y_max</b>
+    <input type="range" id="y_max" min="0" max="30" step="0.5" value="7.0">
+    <output id="y_max_v">7.0</output>
+  </label>
+  <br>
+  <small>y-axis range of the Desmos viewport.</small>
+</div>
+<br>
+<div>
+  <label>
+    <input type="checkbox" id="restrict_domain" checked>
+    <b>Restrict domain to the original segment</b>
+  </label>
+  <br>
+  <small>If checked, each curve is drawn only on its original stroke range; otherwise the polynomial spans the whole viewport (curves will extend past the original stroke).</small>
+</div>
+<hr>
+<button id="copy_link">Copy page link (with current settings)</button>
+<small>Copy the URL to the clipboard so others can see the same view.</small>
+<br><br>
+<button id="copy_latex">Copy all LaTeX equations</button>
+<small>Plain text, one Desmos LaTeX expression per line; you can also paste them into the Desmos expression list one at a time.</small>
+<br><br>
+<button id="download_png">Download graph image (PNG)</button>
+<label>
+  Resolution:
+  <input type="number" id="png_w" min="200" max="4000" step="50" value="1600"> &times;
+  <input type="number" id="png_h" min="200" max="4000" step="50" value="1200">
+</label>
+<small>Renders the current Desmos canvas as a PNG and downloads it locally.</small>
+<br><br>
+<a id="bookmarklet" href="#">One-click load into Desmos (drag to bookmark bar)</a>
+<small id="bookmarklet_info">
+  <b>Drag the link above to your browser's bookmark bar</b>; then on desmos.com/calculator click the bookmark and all curves load automatically.
+  The current state is encoded into the bookmark's <code>javascript:</code> URL.
+</small>
+<hr>
+<div style="display:flex;gap:8px;align-items:stretch">
+  <div id="calculator" style="flex:1;height:640px;border:1px solid #aaa;min-width:400px"></div>
+  <div id="equations_panel" style="width:420px;height:640px;overflow-y:auto;border:1px solid #aaa;padding:6px;font-size:12px">
+    <small>No equations yet.</small>
+  </div>
+</div>
+<hr>
+<details>
+  <summary>Plain-text equation list</summary>
+  <pre id="equation_list" style="white-space:pre-wrap;font-size:11px"></pre>
+</details>
+<script>
+let F = [];
+const C = Desmos.GraphingCalculator(
+  document.getElementById("calculator"),
+  { keypad: false, expressions: false, settingsMenu: true, zoomButtons: true }
+);
+const SI = ["top_n", "max_deg", "x_min", "x_max", "y_min", "y_max"];
+function cL(cs, ot) {
+  const lh = ot === "y=f(x)" ? "y" : "x";
+  const v = ot === "y=f(x)" ? "x" : "y";
+  const d = cs.length - 1;
+  const ts = [];
+  for (let i = 0; i < cs.length; i++) {
+    const c = cs[i];
+    if (Math.abs(c) < 1e-12) continue;
+    const p = d - i;
+    const sg = ts.length === 0 ? (c < 0 ? "-" : "") : (c < 0 ? "-" : "+");
+    const vl = Math.abs(c).toFixed(6);
+    let tm;
+    if (p === 0)      tm = vl;
+    else if (p === 1) tm = vl + v;
+    else              tm = vl + v + "^{" + p + "}";
+    ts.push(sg + tm);
+  }
+  return lh + "=" + (ts.join("") || "0");
+}
+function bL(f, rd) {
+  let eq = cL(f.coeffs, f.orient);
+  if (rd) {
+    const u = f.orient === "y=f(x)" ? "x" : "y";
+    eq += "\\left\\{" + f.u_min.toFixed(6) + "\\le " + u +
+          "\\le " + f.u_max.toFixed(6) + "\\right\\}";
+  }
+  return eq;
+}
+function vF() {
+  const tn = +document.getElementById("top_n").value;
+  const md = +document.getElementById("max_deg").value;
+  return F.filter(f => f.degree <= md).slice(0, tn);
+}
+function rEP(vs, rs) {
+  const pn = document.getElementById("equations_panel");
+  pn.innerHTML = "";
+  if (vs.length === 0) {
+    pn.innerHTML = "<small>No equations yet.</small>";
+    return;
+  }
+  vs.forEach((f, i) => {
+    const eq = bL(f, rs);
+    const wp = document.createElement("div");
+    wp.style.marginBottom = "6px";
+    wp.style.paddingBottom = "4px";
+    wp.style.borderBottom = "1px dashed #ccc";
+    const hd = document.createElement("small");
+    hd.style.color = f.color;
+    hd.textContent = "#" + (i + 1) +
+      "  deg=" + f.degree +
+      "  arc=" + f.arc.toFixed(2) +
+      "  max_err=" + f.max_err.toFixed(3);
+    wp.appendChild(hd);
+    wp.appendChild(document.createElement("br"));
+    const mt = document.createElement("div");
+    mt.style.overflowX = "auto";
+    if (window.katex) {
+      try {
+        katex.render(eq, mt, { throwOnError: false, displayMode: false });
+      } catch (err) {
+        mt.textContent = eq;
+      }
+    } else {
+      mt.textContent = eq;
+    }
+    wp.appendChild(mt);
+    pn.appendChild(wp);
+  });
+}
+function aS() {
+  const rs = document.getElementById("restrict_domain").checked;
+  const xn = +document.getElementById("x_min").value;
+  const xx = +document.getElementById("x_max").value;
+  const yn = +document.getElementById("y_min").value;
+  const yx = +document.getElementById("y_max").value;
+  const vs = vF();
+  C.setBlank();
+  vs.forEach(f => {
+    C.setExpression({
+      id: f.id,
+      latex: bL(f, rs),
+      color: f.color,
+      lineWidth: 2.0
+    });
+  });
+  C.setMathBounds({left: xn, right: xx, bottom: yn, top: yx});
+  document.getElementById("equation_list").textContent =
+    vs.map((f, i) => "#" + (i + 1).toString().padStart(3) +
+            "  deg=" + f.degree.toString().padStart(2) +
+            "  arc=" + f.arc.toFixed(2) +
+            "  |  " + bL(f, rs))
+      .join("\n");
+  rEP(vs, rs);
+}
+function sO() {
+  SI.forEach(id => {
+    document.getElementById(id + "_v").textContent =
+      document.getElementById(id).value;
+  });
+}
+function sH() {
+  const ps = SI.map(id => id + "=" + document.getElementById(id).value);
+  ps.push("rd=" + (document.getElementById("restrict_domain").checked ? "1" : "0"));
+  history.replaceState(null, "", "#" + ps.join("&"));
+}
+function rFH() {
+  if (!location.hash) return;
+  location.hash.slice(1).split("&").forEach(pr => {
+    const [k, v] = pr.split("=");
+    if (k === "rd") {
+      document.getElementById("restrict_domain").checked = v === "1";
+      return;
+    }
+    const el = document.getElementById(k);
+    if (el) el.value = v;
+  });
+}
+function r() {
+  if (F.length === 0) return;
+  sO();
+  aS();
+  sH();
+  rBM();
+}
+function sF(fs, bd) {
+  F = fs || [];
+  const tn = document.getElementById("top_n");
+  tn.max = Math.max(1, F.length);
+  tn.disabled = F.length === 0;
+  if (+tn.value > F.length || +tn.value < 1) {
+    tn.value = Math.min(40, F.length) || 1;
+  }
+  document.getElementById("top_n_total").textContent = F.length;
+  if (bd && bd.length === 4) {
+    document.getElementById("x_min").value = bd[0];
+    document.getElementById("x_max").value = bd[1];
+    document.getElementById("y_min").value = bd[2];
+    document.getElementById("y_max").value = bd[3];
+  }
+  rFH();
+  r();
+}
+function sS(m) {
+  document.getElementById("status").textContent = m;
+}
+async function uI(fi) {
+  sS("Uploading (" + (fi.size / 1024).toFixed(1) + " KB) + extracting outline + fitting; this may take a few seconds...");
+  const ru = URL.createObjectURL(fi);
+  const ri = document.getElementById("preview_raw");
+  ri.src = ru;
+  ri.onload = () => URL.revokeObjectURL(ru);
+  document.getElementById("preview_outline").removeAttribute("src");
+  try {
+    const rs = await fetch("/api/fit", {
+      method: "POST",
+      headers: { "Content-Type": fi.type || "application/octet-stream" },
+      body: fi,
+    });
+    const tx = await rs.text();
+    if (!rs.ok) {
+      let m = tx;
+      try { m = JSON.parse(tx).error || tx; } catch (_) {}
+      sS("Fit failed (HTTP " + rs.status + "): " + m);
+      return;
+    }
+    const dt = JSON.parse(tx);
+    if (dt.outline_png_b64) {
+      document.getElementById("preview_outline").src =
+        "data:image/png;base64," + dt.outline_png_b64;
+    }
+    sF(dt.fits, dt.bounds);
+    sS("Fitted " + dt.fits.length + " curves from " + fi.name + ".");
+  } catch (e) {
+    sS("Fit failed: " + e.message);
+  }
+}
+SI.forEach(id => {
+  document.getElementById(id).addEventListener("input", r);
+});
+document.getElementById("restrict_domain").addEventListener("change", r);
+document.getElementById("upload").addEventListener("change", (e) => {
+  const fi = e.target.files && e.target.files[0];
+  if (fi) uI(fi);
+});
+document.getElementById("copy_link").addEventListener("click", () => {
+  sH();
+  const u = location.href;
+  navigator.clipboard.writeText(u).then(
+    () => alert("Link copied:\n" + u),
+    () => prompt("Auto-copy failed; copy manually:", u)
+  );
+});
+document.getElementById("copy_latex").addEventListener("click", () => {
+  if (F.length === 0) { alert("No fitted curves yet; upload an image first."); return; }
+  const rs = document.getElementById("restrict_domain").checked;
+  const ls = vF().map(f => bL(f, rs));
+  const tx = ls.join("\n");
+  navigator.clipboard.writeText(tx).then(
+    () => alert("Copied " + ls.length + " equations."),
+    () => prompt("Copy manually:", tx)
+  );
+});
+document.getElementById("download_png").addEventListener("click", () => {
+  if (F.length === 0) { alert("No fitted curves yet; upload an image first."); return; }
+  const w = Math.max(200, +document.getElementById("png_w").value || 1600);
+  const h = Math.max(200, +document.getElementById("png_h").value || 1200);
+  const du = C.screenshot({ width: w, height: h, targetPixelRatio: 1 });
+  const a = document.createElement("a");
+  a.href = du;
+  a.download = "curves_" + w + "x" + h + ".png";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+});
+function rBM() {
+  const st = C.getState();
+  const pl =
+    "(function(){" +
+    "var s=" + JSON.stringify(st) + ";" +
+    "var c=window.Calc||(window.Desmos&&window.Desmos.Calculator)||null;" +
+    "if(!c){alert('Click this bookmark while on desmos.com/calculator');return;}" +
+    "c.setState(s);" +
+    "})();";
+  const u = "javascript:" + encodeURIComponent(pl);
+  const a = document.getElementById("bookmarklet");
+  a.href = u;
+  const sk = (u.length / 1024).toFixed(1);
+  const inf = document.getElementById("bookmarklet_info");
+  let wn = "";
+  if (u.length > 65000) {
+    wn = " WARNING: state exceeds ~64KB; some browsers (Firefox) may truncate the bookmark. Try lowering Top-N before dragging.";
+    a.style.color = "#c0392b";
+  } else if (u.length > 32000) {
+    wn = " Note: current size " + sk + " KB; Chrome OK, borderline for Safari/Firefox.";
+    a.style.color = "#e67e22";
+  } else {
+    a.style.color = "";
+  }
+  inf.innerHTML =
+    "<b>Drag the link above to your browser's bookmark bar</b>; then on desmos.com/calculator click it to auto-load all curves. " +
+    "Current bookmarklet size: <b>" + sk + " KB</b>." + wn;
+}
+sO();
+</script>
+</body>
+</html>

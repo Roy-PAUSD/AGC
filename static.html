@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Polynomial Fits — Desmos (static)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://www.desmos.com/api/v1.7/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+</head>
+<body style="margin:0">
+<div style="display:flex;width:100vw;height:100vh">
+  <div id="calc" style="flex:1;height:100vh;min-width:400px"></div>
+  <div id="equations_panel" style="width:420px;height:100vh;overflow-y:auto;padding:6px;font-size:12px;border-left:1px solid #aaa">
+    <small>Loading equations...</small>
+  </div>
+</div>
+<script>
+const S = {"version": 10, "graph": {"viewport": {"xmin": -10.0, "xmax": 10.0, "ymin": -7.0, "ymax": 7.0}, "squareAxes": true}, "expressions": {"list": [{"type": "expression", "id": "c0", "latex": "x=0.000006y^{9}-0.000024y^{8}-0.000272y^{7}+0.000737y^{6}+0.004840y^{5}-0.003868y^{4}-0.026417y^{3}+0.003357y^{2}-0.859957y-7.275932\\left\\{-4.044444\\le y\\le 5.561111\\right\\}", "color": "#c74440", "lineWidth": 2.0}, {"type": "expression", "id": "c1", "latex": "y=-0.013600x-4.121527\\left\\{1.343750\\le x\\le 9.953125\\right\\}", "color": "#2d70b3", "lineWidth": 2.0}, {"type": "expression", "id": "c2", "latex": "x=-9.984375\\left\\{-3.947222\\le y\\le 3.052778\\right\\}", "color": "#388c46", "lineWidth": 2.0}, {"type": "expression", "id": "c3", "latex": "y=-0.023025x-4.206363\\left\\{-9.953125\\le x\\le -3.703125\\right\\}", "color": "#6042a6", "lineWidth": 2.0}, {"type": "expression", "id": "c4", "latex": "x=-0.001304y^{3}+0.003993y^{2}-0.896129y-4.800870\\left\\{-2.177778\\le y\\le 2.002778\\right\\}", "color": "#000000", "lineWidth": 2.0}, {"type": "expression", "id": "c5", "latex": "x=0.002134y^{8}-0.079875y^{7}+1.276551y^{6}-11.353908y^{5}+61.355135y^{4}-206.032836y^{3}+419.631243y^{2}-473.950684y+220.798941\\left\\{2.080556\\le y\\le 6.980556\\right\\}", "color": "#fa7e19", "lineWidth": 2.0}, {"type": "expression", "id": "c6", "latex": "x=-0.890399y-4.814194\\left\\{2.061111\\le y\\le 5.600000\\right\\}", "color": "#c55c1e", "lineWidth": 2.0}, {"type": "expression", "id": "c7", "latex": "x=0.025482y^{8}-0.372828y^{7}+2.240965y^{6}-7.070009y^{5}+12.332451y^{4}-11.406018y^{3}+5.154320y^{2}-1.647373y-1.917497\\left\\{-0.019444\\le y\\le 3.616667\\right\\}", "color": "#3d8545", "lineWidth": 2.0}, {"type": "expression", "id": "c8", "latex": "x=0.105742y^{7}-0.737606y^{6}+1.760486y^{5}-1.484870y^{4}-0.066018y^{3}+0.302494y^{2}+0.111765y+0.594677\\left\\{-0.563889\\le y\\le 2.313889\\right\\}", "color": "#b0407c", "lineWidth": 2.0}, {"type": "expression", "id": "c9", "latex": "x=0.004417y-9.955487\\left\\{-6.961111\\le y\\le -4.025000\\right\\}", "color": "#c78433", "lineWidth": 2.0}, {"type": "expression", "id": "c10", "latex": "y=-0.451057x^{6}-2.306551x^{5}-3.548710x^{4}-0.845599x^{3}+0.518243x^{2}-1.568209x-3.201306\\left\\{-2.000000\\le x\\le -0.015625\\right\\}", "color": "#c74440", "lineWidth": 2.0}, {"type": "expression", "id": "c11", "latex": "x=-10.000000\\left\\{3.091667\\le y\\le 5.347222\\right\\}", "color": "#2d70b3", "lineWidth": 2.0}, {"type": "expression", "id": "c12", "latex": "x=0.051123y^{2}+0.201161y+0.500631\\left\\{-6.066667\\le y\\le -4.336111\\right\\}", "color": "#388c46", "lineWidth": 2.0}, {"type": "expression", "id": "c13", "latex": "x=-0.064966y^{2}-0.442553y-3.239026\\left\\{-5.911111\\le y\\le -4.141667\\right\\}", "color": "#6042a6", "lineWidth": 2.0}, {"type": "expression", "id": "c14", "latex": "x=0.060599y-3.007744\\left\\{-5.930556\\le y\\le -4.161111\\right\\}", "color": "#000000", "lineWidth": 2.0}, {"type": "expression", "id": "c15", "latex": "x=-0.134372y^{2}+0.405962y-1.046207\\left\\{2.061111\\le y\\le 3.616667\\right\\}", "color": "#fa7e19", "lineWidth": 2.0}, {"type": "expression", "id": "c16", "latex": "y=-0.038417x-6.303109\\left\\{5.156250\\le x\\le 6.875000\\right\\}", "color": "#c55c1e", "lineWidth": 2.0}, {"type": "expression", "id": "c17", "latex": "x=-0.940958y^{5}-11.451146y^{4}-54.822987y^{3}-128.912778y^{2}-148.982217y-67.162685\\left\\{-3.188889\\le y\\le -1.575000\\right\\}", "color": "#3d8545", "lineWidth": 2.0}, {"type": "expression", "id": "c18", "latex": "y=-0.009042x-4.154285\\left\\{-1.125000\\le x\\le 0.484375\\right\\}", "color": "#b0407c", "lineWidth": 2.0}, {"type": "expression", "id": "c19", "latex": "x=0.055180y-0.873569\\left\\{0.272222\\le y\\le 1.750000\\right\\}", "color": "#c78433", "lineWidth": 2.0}, {"type": "expression", "id": "c20", "latex": "x=0.053806y-0.710953\\left\\{0.272222\\le y\\le 1.730556\\right\\}", "color": "#c74440", "lineWidth": 2.0}, {"type": "expression", "id": "c21", "latex": "x=-0.336725y+0.126195\\left\\{2.197222\\le y\\le 3.519444\\right\\}", "color": "#2d70b3", "lineWidth": 2.0}, {"type": "expression", "id": "c22", "latex": "y=-0.001937x-6.914749\\left\\{2.843750\\le x\\le 4.171875\\right\\}", "color": "#388c46", "lineWidth": 2.0}, {"type": "expression", "id": "c23", "latex": "y=-0.019756x-4.164666\\left\\{-2.468750\\le x\\le -1.171875\\right\\}", "color": "#6042a6", "lineWidth": 2.0}, {"type": "expression", "id": "c24", "latex": "x=-0.877984y-4.715152\\left\\{-4.083333\\le y\\le -3.130556\\right\\}", "color": "#000000", "lineWidth": 2.0}, {"type": "expression", "id": "c25", "latex": "x=0.449915y^{2}+5.308806y+17.241265\\left\\{-6.961111\\le y\\le -5.930556\\right\\}", "color": "#fa7e19", "lineWidth": 2.0}, {"type": "expression", "id": "c26", "latex": "x=-9.984375\\left\\{5.775000\\le y\\le 7.000000\\right\\}", "color": "#c55c1e", "lineWidth": 2.0}, {"type": "expression", "id": "c27", "latex": "y=0.016319x-6.644560\\left\\{-8.343750\\le x\\le -7.140625\\right\\}", "color": "#3d8545", "lineWidth": 2.0}, {"type": "expression", "id": "c28", "latex": "y=0.002450x-5.487708\\left\\{-5.484375\\le x\\le -4.312500\\right\\}", "color": "#b0407c", "lineWidth": 2.0}, {"type": "expression", "id": "c29", "latex": "x=3.295048y^{5}+59.108828y^{4}+422.872825y^{3}+1508.085561y^{2}+2681.130962y+1898.044216\\left\\{-4.083333\\le y\\le -3.013889\\right\\}", "color": "#c78433", "lineWidth": 2.0}, {"type": "expression", "id": "c30", "latex": "x=0.460399y-1.771471\\left\\{-2.158333\\le y\\le -1.186111\\right\\}", "color": "#c74440", "lineWidth": 2.0}, {"type": "expression", "id": "c31", "latex": "y=0.011148x-5.828272\\left\\{6.781250\\le x\\le 7.859375\\right\\}", "color": "#2d70b3", "lineWidth": 2.0}, {"type": "expression", "id": "c32", "latex": "y=-0.004940x-6.313552\\left\\{5.531250\\le x\\le 6.578125\\right\\}", "color": "#388c46", "lineWidth": 2.0}, {"type": "expression", "id": "c33", "latex": "x=-1.510021y^{3}+17.514684y^{2}-67.687694y+87.726205\\left\\{3.869444\\le y\\le 4.588889\\right\\}", "color": "#6042a6", "lineWidth": 2.0}, {"type": "expression", "id": "c34", "latex": "x=0.336179y^{2}+0.293936y+0.191139\\left\\{-1.516667\\le y\\le -0.602778\\right\\}", "color": "#000000", "lineWidth": 2.0}, {"type": "expression", "id": "c35", "latex": "y=-2.744492x^{3}-3.156458x^{2}-1.363398x-0.354224\\left\\{-0.671875\\le x\\le 0.109375\\right\\}", "color": "#fa7e19", "lineWidth": 2.0}, {"type": "expression", "id": "c36", "latex": "x=0.189579y^{2}+2.341932y+4.294639\\left\\{-6.883333\\le y\\le -5.969444\\right\\}", "color": "#c55c1e", "lineWidth": 2.0}, {"type": "expression", "id": "c37", "latex": "y=0.003319x-5.309027\\left\\{-7.281250\\le x\\le -6.359375\\right\\}", "color": "#3d8545", "lineWidth": 2.0}, {"type": "expression", "id": "c38", "latex": "x=-0.684568y^{3}-7.764570y^{2}-29.590435y-36.685534\\left\\{-4.063889\\le y\\le -3.247222\\right\\}", "color": "#b0407c", "lineWidth": 2.0}, {"type": "expression", "id": "c39", "latex": "x=-0.548601y^{2}-6.534413y-22.810302\\left\\{-6.766667\\le y\\le -6.008333\\right\\}", "color": "#c78433", "lineWidth": 2.0}]}};
+const c = Desmos.GraphingCalculator(
+  document.getElementById("calc"),
+  { expressions: true, settingsMenu: true, zoomButtons: true, keypad: false }
+);
+c.setState(S);
+function rP() {
+  const pn = document.getElementById("equations_panel");
+  const ex = (S.expressions && S.expressions.list) || [];
+  pn.innerHTML = "";
+  if (ex.length === 0) {
+    pn.innerHTML = "<small>No equations.</small>";
+    return;
+  }
+  ex.forEach((e, i) => {
+    const wp = document.createElement("div");
+    wp.style.marginBottom = "6px";
+    wp.style.paddingBottom = "4px";
+    wp.style.borderBottom = "1px dashed #ccc";
+    const hd = document.createElement("small");
+    hd.style.color = e.color || "#000";
+    hd.textContent = "#" + (i + 1) + "  " + (e.id || "");
+    wp.appendChild(hd);
+    wp.appendChild(document.createElement("br"));
+    const mt = document.createElement("div");
+    mt.style.overflowX = "auto";
+    if (window.katex) {
+      try {
+        katex.render(e.latex || "", mt, { throwOnError: false, displayMode: false });
+      } catch (err) {
+        mt.textContent = e.latex || "";
+      }
+    } else {
+      mt.textContent = e.latex || "";
+    }
+    wp.appendChild(mt);
+    pn.appendChild(wp);
+  });
+}
+if (document.readyState === "complete") {
+  rP();
+} else {
+  window.addEventListener("load", rP);
+}
+</script>
+</body>
+</html>

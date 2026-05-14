@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Polynomial Fits — Desmos (static)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://www.desmos.com/api/v1.7/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+</head>
+<body style="margin:0">
+<div style="display:flex;width:100vw;height:100vh">
+  <div id="calc" style="flex:1;height:100vh;min-width:400px"></div>
+  <div id="equations_panel" style="width:420px;height:100vh;overflow-y:auto;padding:6px;font-size:12px;border-left:1px solid #aaa">
+    <small>Loading equations...</small>
+  </div>
+</div>
+<script>
+const S = __STATE_JSON__;
+const c = Desmos.GraphingCalculator(
+  document.getElementById("calc"),
+  { expressions: true, settingsMenu: true, zoomButtons: true, keypad: false }
+);
+c.setState(S);
+function rP() {
+  const pn = document.getElementById("equations_panel");
+  const ex = (S.expressions && S.expressions.list) || [];
+  pn.innerHTML = "";
+  if (ex.length === 0) {
+    pn.innerHTML = "<small>No equations.</small>";
+    return;
+  }
+  ex.forEach((e, i) => {
+    const wp = document.createElement("div");
+    wp.style.marginBottom = "6px";
+    wp.style.paddingBottom = "4px";
+    wp.style.borderBottom = "1px dashed #ccc";
+    const hd = document.createElement("small");
+    hd.style.color = e.color || "#000";
+    hd.textContent = "#" + (i + 1) + "  " + (e.id || "");
+    wp.appendChild(hd);
+    wp.appendChild(document.createElement("br"));
+    const mt = document.createElement("div");
+    mt.style.overflowX = "auto";
+    if (window.katex) {
+      try {
+        katex.render(e.latex || "", mt, { throwOnError: false, displayMode: false });
+      } catch (err) {
+        mt.textContent = e.latex || "";
+      }
+    } else {
+      mt.textContent = e.latex || "";
+    }
+    wp.appendChild(mt);
+    pn.appendChild(wp);
+  });
+}
+if (document.readyState === "complete") {
+  rP();
+} else {
+  window.addEventListener("load", rP);
+}
+</script>
+</body>
+</html>
