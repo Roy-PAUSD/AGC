@@ -5,7 +5,7 @@
 Quick Start:
 1. clone the project
 ```bash
-https://github.com/Roy-PAUSD/AGC.git
+git clone https://github.com/Roy-PAUSD/AGC.git
 ```
 3. use venv or global environment to install the requirements
 ```bash
