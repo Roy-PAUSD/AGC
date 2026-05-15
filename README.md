@@ -15,3 +15,10 @@ pip install -r requirements.txt
 ```
 5. start using `python app.py` port and adress should be prompted
 6. Enjoy :)
+
+Show cases:
+
+![Flower](showcase/flower/overview.png)
+![Flower](showcase/coffee/overview.png)
+![Flower](showcase/eiffel/overview.png)
+![Flower](showcase/cat/overview.png)
