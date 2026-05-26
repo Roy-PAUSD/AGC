@@ -16,6 +16,10 @@ pip install -r requirements.txt
 5. start using `python app.py` port and adress should be prompted
 6. Enjoy :)
 
+Screen shot:
+<img width="950" height="430" alt="image" src="https://github.com/user-attachments/assets/b674c23c-0fb2-4c42-9f70-46376ba0fa5f" />
+
+
 How it works:
 <img width="931" height="396" alt="image" src="https://github.com/user-attachments/assets/832208e8-333e-416a-b30f-7c873d2a6179" />
 
